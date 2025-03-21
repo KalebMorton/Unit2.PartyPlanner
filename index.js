@@ -7,28 +7,107 @@ submitButtion.addEventListener("submit", formSubmited)
 
 function formSubmited(event){
     event.preventDefault();
-    const partyDateAndTime = new Date(`${submitButtion.elements.partyDate.value}:${submitButtion.elements.partyTime.value}`)
-    addParty(
-        submitButtion.elements.partyName.value,
-        submitButtion.elements.partyDescription.value,
-        partyDateAndTime.toISOString(),
-        submitButtion.elements.partyLocation.value
-    )
+    try{
+        const partyDateAndTime = new Date(submitButtion.elements.partyDateTime.value)
+        addParty(
+            submitButtion.elements.partyName.value,
+            submitButtion.elements.partyDescription.value,
+            partyDateAndTime.toISOString(),
+            submitButtion.elements.partyLocation.value
+        )
+    }catch{
+        alert("Please enter in all fields")
+    }
 }
 
-async function getParties(){
+async function updateParties(){
     try{
         const response = await fetch(apiUrl)
         const rawData = await response.json()
         console.log(rawData.data)
 
-        listDisplay.textContent = `<div>
-        ${rawData.data[1].name} ${rawData.data[1].description}
-        <div>`
+        listDisplay.innerHTML = ""
+        for(i = 0; i < rawData.data.length; i++){
+            listDisplay.innerHTML = `${listDisplay.innerHTML}<div>
+                <h3>${rawData.data[i].name}</h3> 
+                ${rawData.data[i].description}
+                <br>
+                Starts on: ${decodeDate(rawData.data[i].date)}
+                <br>
+                <button class="delete" id="${rawData.data[i].id}">Delete</button>
+            </div>`
+        }
+
+        const deleteButtons = (document.getElementsByClassName("delete"))
+        for(i = 0; i < deleteButtons.length; i++){
+            deleteButtons[i].addEventListener("click", () => {
+                console.log(i)
+            })
+        }
 
     }catch{
         console.error(error)
     }
+}
+
+function testFunc(event){
+    event.preventDefault();
+    console.log(deleteButtons)
+}
+
+function decodeDate(RawDate){
+    const inputDate = new Date(RawDate)
+
+    let monthName;
+    switch(inputDate.getMonth()){
+        case 0:
+            monthName = "January"
+            break;
+        case 1:
+            monthName = "February"
+            break;
+        case 2:
+            monthName = "March"
+            break;
+        case 3:
+            monthName = "April"
+            break;
+        case 4:
+            monthName = "May"
+            break;
+        case 5:
+            monthName = "June"
+            break;
+        case 6:
+            monthName = "July"
+            break;
+        case 7:
+            monthName = "August"
+            break;
+        case 8:
+            monthName = "September"
+            break;
+        case 9:
+            monthName = "October"
+            break;
+        case 10:
+            monthName = "November"
+            break;
+        case 11:
+                monthName = "December"
+                break;
+        }
+
+    const timeIn12Hour = ((inputDate.getHours()) > 12) ? (inputDate.getHours() - 12) : (inputDate.getHours())
+    const minetsWithExtra0s = (inputDate.getMinutes() < 9) ? (`${inputDate.getMinutes()}0`) : inputDate.getMinutes()
+
+
+    return (`
+        ${monthName},
+        ${inputDate.getDate()}
+        ${inputDate.getFullYear()} at
+        ${timeIn12Hour}:${minetsWithExtra0s}
+    `)
 }
 
 async function addParty(pName, pDescription, pDate, pLocation) {
@@ -46,7 +125,7 @@ async function addParty(pName, pDescription, pDate, pLocation) {
 
 async function deleteParty(url, id) {
     try{
-        const res = await fetch(`${url}/${id}`,{
+        await fetch(`${url}/${id}`,{
             method: "DELETE"
         })
     }catch{
@@ -55,4 +134,4 @@ async function deleteParty(url, id) {
     
 }
 
-getParties()
+updateParties()
