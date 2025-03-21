@@ -109,8 +109,8 @@ function decodeDate(RawDate){
 
 
     return (`
-        ${monthName},
-        ${inputDate.getDate()}
+        ${monthName}
+        ${inputDate.getDate()},
         ${inputDate.getFullYear()} at
         ${timeIn12Hour}:${minetsWithExtra0s}${inputDate.getHours() > 12 ? "pm" : "am"}
     `)
