@@ -27,6 +27,12 @@ async function updateParties(){
         console.log(rawData.data)
 
         listDisplay.innerHTML = ""
+        let deleteButtons = (document.getElementsByClassName("delete"))
+        for(i = 0; i < deleteButtons.length; i++){
+            deleteButtons[i].removeEventListener
+        }
+
+
         for(i = 0; i < rawData.data.length; i++){
             listDisplay.innerHTML = `${listDisplay.innerHTML}<div>
                 <h3>${rawData.data[i].name}</h3> 
@@ -34,15 +40,15 @@ async function updateParties(){
                 <br>
                 Starts on: ${decodeDate(rawData.data[i].date)}
                 <br>
+                Location: ${rawData.data[i].location}
+                <br>
                 <button class="delete" id="${rawData.data[i].id}">Delete</button>
             </div>`
         }
 
-        const deleteButtons = (document.getElementsByClassName("delete"))
+        deleteButtons = (document.getElementsByClassName("delete"))
         for(i = 0; i < deleteButtons.length; i++){
-            deleteButtons[i].addEventListener("click", () => {
-                console.log(i)
-            })
+            deleteButtons[i].addEventListener("click", testFunc)
         }
 
     }catch{
@@ -52,7 +58,8 @@ async function updateParties(){
 
 function testFunc(event){
     event.preventDefault();
-    console.log(deleteButtons)
+    console.log(event.currentTarget.id)
+    deleteParty(event.currentTarget.id)
 }
 
 function decodeDate(RawDate){
@@ -106,28 +113,33 @@ function decodeDate(RawDate){
         ${monthName},
         ${inputDate.getDate()}
         ${inputDate.getFullYear()} at
-        ${timeIn12Hour}:${minetsWithExtra0s}
+        ${timeIn12Hour}:${minetsWithExtra0s}${inputDate.getHours() > 12 ? "pm" : "am"}
     `)
 }
 
 async function addParty(pName, pDescription, pDate, pLocation) {
     try{
         await fetch(apiUrl,{
-          method: "POST",
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({name: pName, description: pDescription, date: pDate, location: pLocation})
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name: pName, description: pDescription, date: pDate, location: pLocation})
         })
-    
+        
+        updateParties()
+
     }catch(error){
         console.error(error)
     }
 }
 
-async function deleteParty(url, id) {
+async function deleteParty(id) {
     try{
-        await fetch(`${url}/${id}`,{
+        await fetch(`${apiUrl}/${id}`,{
             method: "DELETE"
         })
+
+        updateParties()
+
     }catch{
         console.error(error)
     }
