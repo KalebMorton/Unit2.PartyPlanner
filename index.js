@@ -24,7 +24,6 @@ async function updateParties(){
     try{
         const response = await fetch(apiUrl)
         const rawData = await response.json()
-        console.log(rawData.data)
 
         listDisplay.innerHTML = ""
         let deleteButtons = (document.getElementsByClassName("delete"))
